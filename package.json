@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "docs": "gulp jsdoc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,6 +19,7 @@
   "homepage": "https://github.com/oniproject/pixiLights",
   "devDependencies": {
     "gulp": "^3.8.10",
-    "gulp-jsdoc": "^0.1.4"
+    "gulp-jsdoc": "^0.1.4",
+    "ink-docstrap": "^0.4.12"
   }
 }

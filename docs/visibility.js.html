@@ -1,4 +1,59 @@
-'use strict';
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Documentation Source: /home/lain/gocode/src/oniproject/pixiLights/src/visibility.js</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.default.css">
+
+	
+	<link type="text/css" rel="stylesheet" href="styles/site.simplex.css">
+	
+</head>
+
+<body>
+<div class="container-fluid">
+	<div class="navbar navbar-fixed-top ">
+		<div class="navbar-inner">
+			<a class="brand" href="index.html">Documentation</a>
+			<ul class="nav">
+				
+				<li class="dropdown">
+					<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b
+						class="caret"></b></a>
+
+					<ul class="dropdown-menu ">
+						
+						<li>
+							<a href="Visibility.html">Visibility</a>
+						</li>
+						
+
+					</ul>
+				</li>
+				
+			</ul>
+		</div>
+	</div>
+
+	<div class="row-fluid">
+
+		
+			<div class="span12">
+				
+				<div id="main">
+					
+
+
+		<h1 class="page-title">Source: /home/lain/gocode/src/oniproject/pixiLights/src/visibility.js</h1>
+    
+    <section>
+        <article>
+            <pre class="sunlight-highlight-javascript linenums">'use strict';
 
 var Block = function() {
 	/** @member {Float} */
@@ -76,10 +131,10 @@ var Visibility = function() {
 Visibility._endpoint_compare = function(a, b) {
 	// Traverse in angle order
 	if (a.angle > b.angle) return 1;
-	if (a.angle < b.angle) return -1;
+	if (a.angle &lt; b.angle) return -1;
 	// But for ties (common), we want Begin nodes before End nodes
-	if (!a.begin && b.begin) return 1;
-	if (a.begin && !b.begin) return -1;
+	if (!a.begin &amp;&amp; b.begin) return 1;
+	if (a.begin &amp;&amp; !b.begin) return -1;
 	return 0;
 };
 
@@ -101,12 +156,12 @@ Visibility.leftOf = function(s, p) {
 	// use z coordinate inputs (they're 0), and we only need the
 	// sign. If you're annoyed that cross product is only defined
 	// in 3d, see "outer product" in Geometric Algebra.
-	// <http://en.wikipedia.org/wiki/Geometric_algebra>
+	// &lt;http://en.wikipedia.org/wiki/Geometric_algebra>
 	var cross = (s.p2.x - s.p1.x) * (p.y - s.p1.y) - (s.p2.y - s.p1.y) * (p.x - s.p1.x);
-	return cross < 0;
+	return cross &lt; 0;
 	// Also note that this is the naive version of the test and
 	// isn't numerically robust. See
-	// <https://github.com/mikolalysenko/robust-arithmetic> for a
+	// &lt;https://github.com/mikolalysenko/robust-arithmetic> for a
 	// demo of how this fails when a point is very close to the
 	// line.
 };
@@ -136,7 +191,7 @@ Visibility.prototype = {
 		this.addSegment(margin, size - margin, size - margin, size - margin);
 		this.addSegment(size - margin, size - margin, size - margin, margin);
 		this.addSegment(size - margin, margin, margin, margin);
-		// NOTE: if using the simpler distance function (a.d < b.d)
+		// NOTE: if using the simpler distance function (a.d &lt; b.d)
 		// then we need segments to be similarly sized, so the edge of
 		// the map needs to be broken up into smaller segments.
 	},
@@ -155,7 +210,7 @@ Visibility.prototype = {
 		this.endpoints = [];
 		this.loadEdgeOfMap(size, margin);
 
-		for (var i = 0, l = blocks.length; i < l; i++) {
+		for (var i = 0, l = blocks.length; i &lt; l; i++) {
 			var block = blocks[i];
 			var x = block.x;
 			var y = block.y;
@@ -166,7 +221,7 @@ Visibility.prototype = {
 			this.addSegment(x + r, y - r, x - r, y - r);
 		}
 
-		for (var i = 0, l = walls.length; i < l; i++) {
+		for (var i = 0, l = walls.length; i &lt; l; i++) {
 			var wall = walls[i];
 			this.addSegment(wall.p1.x, wall.p1.y, wall.p2.x, wall.p2.y);
 		}
@@ -218,7 +273,7 @@ Visibility.prototype = {
 		this.center.x = x;
 		this.center.y = y;
 
-		for (var i = 0, l = this.segments.length; i < l; i++) {
+		for (var i = 0, l = this.segments.length; i &lt; l; i++) {
 			var segment = this.segments[i];
 
 			var dx = 0.5 * (segment.p1.x + segment.p2.x) - x;
@@ -232,14 +287,14 @@ Visibility.prototype = {
 			// NOTE: future optimization: we could record the quadrant
 			// and the y/x or x/y ratio, and sort by (quadrant,
 			// ratio), instead of calling atan2. See
-			// <https://github.com/mikolalysenko/compare-slope> for a
+			// &lt;https://github.com/mikolalysenko/compare-slope> for a
 			// library that does this. Alternatively, calculate the
 			// angles and use bucket sort to get an O(N) sort.
 			segment.p1.angle = Math.atan2(segment.p1.y - y, segment.p1.x - x);
 			segment.p2.angle = Math.atan2(segment.p2.y - y, segment.p2.x - x);
 
 			var dAngle = segment.p2.angle - segment.p1.angle;
-			if (dAngle <= -Math.PI) {
+			if (dAngle &lt;= -Math.PI) {
 				dAngle += 2 * Math.PI;
 			}
 			if (dAngle > Math.PI) {
@@ -281,12 +336,12 @@ Visibility.prototype = {
 		// both collect and process them. However it would be more
 		// efficient to go through all the segments, figure out which
 		// ones intersect the initial sweep line, and then sort them.
-		for (var pass = 0; pass < 2; pass++) {
-			for (var i = 0, l = this.endpoints.length; i < l; i++) {
+		for (var pass = 0; pass &lt; 2; pass++) {
+			for (var i = 0, l = this.endpoints.length; i &lt; l; i++) {
 				var p = this.endpoints[i];
 
 				// Early exit for the visualization to show the sweep process
-				if (pass == 1 && p.angle > maxAngle) break;
+				if (pass == 1 &amp;&amp; p.angle > maxAngle) break;
 
 				var current_old = null;
 				if (this.open._size !== 0) {
@@ -366,10 +421,10 @@ Visibility.prototype = {
 		// viewer and B. We can do the same with B1-B2: if A1 and A2
 		// are on one side, and relativeTo is on the other side, then
 		// B is in between the viewer and A.
-		if (B1 == B2 && B2 != B3) return true;
-		if (A1 == A2 && A2 == A3) return true;
-		if (A1 == A2 && A2 != A3) return false;
-		if (B1 == B2 && B2 == B3) return false;
+		if (B1 == B2 &amp;&amp; B2 != B3) return true;
+		if (A1 == A2 &amp;&amp; A2 == A3) return true;
+		if (A1 == A2 &amp;&amp; A2 != A3) return false;
+		if (B1 == B2 &amp;&amp; B2 == B3) return false;
 
 		// If A1 != A2 and B1 != B2 then we have an intersection.
 		// Expose it for the GUI to show a message. A more robust
@@ -378,7 +433,7 @@ Visibility.prototype = {
 		this.demo_intersectionsDetected.push([a.p1, a.p2, b.p1, b.p2]);
 		return false;
 
-		// NOTE: previous implementation was a.d < b.d. That's simpler
+		// NOTE: previous implementation was a.d &lt; b.d. That's simpler
 		// but trouble when the segments are of dissimilar sizes. If
 		// you're on a grid and the segments are similarly sized, then
 		// using distance will be a simpler and faster implementation.
@@ -565,7 +620,7 @@ de_polygonal_ds_DLL.prototype = {
 			} else {
 				node = node.next;
 		}
-		return this._size < s;
+		return this._size &lt; s;
 	},
 	clear: function(purge) {
 		if (purge == null) {
@@ -575,7 +630,7 @@ de_polygonal_ds_DLL.prototype = {
 			var node = this.head;
 			var _g1 = 0;
 			var _g = this._size;
-			while (_g1 < _g) {
+			while (_g1 &lt; _g) {
 				var i = _g1++;
 				var next = node.next;
 				node.prev = null;
@@ -602,7 +657,7 @@ de_polygonal_ds_DLL.prototype = {
 		var node = this.head;
 		var _g1 = 0;
 		var _g = this._size;
-		while (_g1 < _g) {
+		while (_g1 &lt; _g) {
 			var i = _g1++;
 			a[i] = node.val;
 			node = node.next;
@@ -629,14 +684,14 @@ de_polygonal_ds_DLL.prototype = {
 				psize = 0;
 				q = p;
 				var _g = 0;
-				while (_g < insize) {
+				while (_g &lt; insize) {
 					var i1 = _g++;
 					psize++;
 					q = q.next;
 					if (q == null) break;
 				}
 				qsize = insize;
-				while (psize > 0 || qsize > 0 && q != null) {
+				while (psize > 0 || qsize > 0 &amp;&amp; q != null) {
 					if (psize == 0) {
 						e = q;
 						q = q.next;
@@ -665,8 +720,8 @@ de_polygonal_ds_DLL.prototype = {
 				p = q;
 			}
 			tail.next = null;
-			if (nmerges <= 1) break;
-			insize <<= 1;
+			if (nmerges &lt;= 1) break;
+			insize &lt;&lt;= 1;
 		}
 		h.prev = null;
 		this.tail = tail;
@@ -679,10 +734,10 @@ de_polygonal_ds_DLL.prototype = {
 			var m = n.next;
 			var p = n.prev;
 			var v = n.val;
-			if (cmp(v, p.val) < 0) {
+			if (cmp(v, p.val) &lt; 0) {
 				var i = p;
 				while (i.prev != null)
-				if (cmp(v, i.prev.val) < 0) {
+				if (cmp(v, i.prev.val) &lt; 0) {
 						i = i.prev;
 					} else break;
 				if (m != null) {
@@ -720,7 +775,7 @@ de_polygonal_ds_DLL.prototype = {
 	},
 	_putNode: function(x) {
 		var val = x.val;
-		if (this._reservedSize > 0 && this._poolSize < this._reservedSize) {
+		if (this._reservedSize > 0 &amp;&amp; this._poolSize &lt; this._reservedSize) {
 			this._tailPool = this._tailPool.next = x;
 			x.val = null;
 			this._poolSize++;
@@ -775,7 +830,7 @@ de_polygonal_ds_CircularDLLIterator.prototype = {
 		return this;
 	},
 	hasNext: function() {
-		return this._i < this._s;
+		return this._i &lt; this._s;
 	},
 	next: function() {
 		var x = this._walker.val;
@@ -825,3 +880,60 @@ de_polygonal_ds_DLLNode.prototype = {
 
 var de_polygonal_ds_HashKey = function() {};
 de_polygonal_ds_HashKey._counter = 0;
+</pre>
+        </article>
+    </section>
+
+
+
+
+
+				</div>
+
+				<div class="clearfix"></div>
+				<footer>
+					
+					
+		<span class="jsdoc-message">
+		Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.0-alpha5</a>
+		on Fri Jan 23 2015 20:52:51 GMT+0300 (MSK) using the <a href="https://github.com/terryweiss/docstrap">DocStrap template</a>.
+		</span>
+				</footer>
+			</div>
+
+			
+			<br clear="both">
+		</div>
+
+	</div>
+	<script src="scripts/sunlight.js"></script>
+	<script src="scripts/sunlight.javascript.js"></script>
+	<script src="scripts/sunlight-plugin.doclinks.js"></script>
+	<script src="scripts/sunlight-plugin.linenumbers.js"></script>
+	<script src="scripts/sunlight-plugin.menu.js"></script>
+	<script src="scripts/jquery.min.js"></script>
+	<script src="scripts/jquery.scrollTo.js"></script>
+	<script src="scripts/jquery.localScroll.js"></script>
+	<script src="scripts/bootstrap-dropdown.js"></script>
+	<script src="scripts/toc.js"></script>
+
+
+	<script>  Sunlight.highlightAll({lineNumbers:true,  showMenu: true, enableDoclinks :true}); </script>
+
+	<script>
+		$( function () {
+			$( "#toc" ).toc( {
+				selectors   : "h1,h2,h3,h4",
+				showAndHide : false,
+				scrollTo    : 60
+			} );
+			$( "#toc>ul" ).addClass( "nav nav-pills nav-stacked" );
+			$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+
+		} );
+	</script>
+
+	
+
+</body>
+</html>
