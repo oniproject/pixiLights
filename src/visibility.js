@@ -159,11 +159,25 @@ Visibility.prototype = {
 			var block = blocks[i];
 			var x = block.x;
 			var y = block.y;
-			var r = block.r;
+			var w = block.r || block.width;
+			var h = block.r || block.height;
+
+			/*
 			this.addSegment(x - r, y - r, x - r, y + r);
 			this.addSegment(x - r, y + r, x + r, y + r);
 			this.addSegment(x + r, y + r, x + r, y - r);
 			this.addSegment(x + r, y - r, x - r, y - r);
+			*/
+			/*
+			this.addSegment(x - w, y - h, x - w, y + h);
+			this.addSegment(x - w, y + h, x + w, y + h);
+			this.addSegment(x + w, y + h, x + w, y - h);
+			this.addSegment(x + w, y - h, x - w, y - h);
+			*/
+			this.addSegment(x, y, x, y + h);
+			this.addSegment(x, y + h, x + w, y + h);
+			this.addSegment(x + w, y + h, x + w, y);
+			this.addSegment(x + w, y, x, y);
 		}
 
 		for (var i = 0, l = walls.length; i < l; i++) {

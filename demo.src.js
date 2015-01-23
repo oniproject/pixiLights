@@ -84,69 +84,96 @@ for (var i = 0, l = mazeLights.length; i < l; i++) {
 }
 
 var container = new LightContainer();
-stage.addChild(container);
 stage.addChild(container.graphics);
+stage.addChild(container.norm);
+stage.addChild(container.diff);
+stage.addChild(container);
 
 container.loadMap(mazeWalls);
-/*
-var visibility = new Visibility();
 
-visibility.loadMap(400, -20000, [], walls);
-*/
+var assetsToLoader = ['presentColours.json', 'presentNormals.json', 'couch.jpg', 'counch_norm.jpg'];
+var loader = new PIXI.AssetLoader(assetsToLoader);
+loader.onComplete = onAssetsLoaded;
+loader.load();
 
-
-var cx = 200,
-	cy = 200;
-/*
-var c = new PIXI.Graphics();
-stage.addChild(c);
-*/
-var visibility = container.visibility;
-var c = container.graphics;
-
-renderer.view.addEventListener('mousemove', function(event) {
-	cx = event.clientX;
-	cy = event.clientY;
-});
-
-/*
-   Usage:
-      new Visibility()
-   Whenever map data changes:
-      loadMap
-   Whenever light source changes:
-      setLightLocation
-   To calculate the area:
-      sweep
-	  */
+function onAssetsLoaded() {
 
 
-requestAnimFrame(animate);
-function animate() {
+	var bunny = PIXI.Sprite.fromImage('box_diff02.png');
+	bunny.x = bunny.y = 160;
+	bunny.scale.x = bunny.scale.y = 1;
+	bunny.normalMap = PIXI.Texture.fromImage('box_norm02.png');
+
+	container.addChild(bunny);
+
+
+	var cx = 200,
+		cy = 200,
+		visibility = container.visibility,
+		c = container.graphics;
+
+	renderer.view.addEventListener('mousemove', function(event) {
+		cx = event.clientX;
+		cy = event.clientY;
+	});
+
+	/*
+	   Usage:
+	      new Visibility()
+	   Whenever map data changes:
+	      loadMap
+	   Whenever light source changes:
+	      setLightLocation
+	   To calculate the area:
+	      sweep
+		  */
+
+
 	requestAnimFrame(animate);
+	function animate() {
+		requestAnimFrame(animate);
 
-	stats.begin();
-	c.clear();
+		stats.begin();
+		c.clear();
 
-	for (var i = 0, l = mazeLights.length; i < l; i++) {
-		var p = mazeLights[i];
-		container.drawLight(p[0], p[1], p[2], 0.15)
+		bunny.rotation += 0.01;
+
+
+
+		if (container.diff.shader) {
+			//this.boxContainer.sp2.shader.uniforms.LightPos.value[0] = this.light.light.x / this.res;
+			//this.boxContainer.sp2.shader.uniforms.LightPos.value[1] = this.light.light.y / this.res;
+			container.diff.shader.uniforms.LightPos.value[0] = cx;
+			container.diff.shader.uniforms.LightPos.value[1] = cy;
+		}
+
+		for (var i = 0, l = mazeLights.length; i < l; i++) {
+			var p = mazeLights[i];
+			container.drawLight(p[0], p[1], p[2], 0.15)
+
+			c.beginFill(0xffcc00);
+			c.drawCircle(p[0], p[1], 3);
+			c.endFill();
+		}
+
+		container.drawLight(cx, cy, 0xffcc00, 0.3)
 
 		c.beginFill(0xffcc00);
-		c.drawCircle(p[0], p[1], 3);
+		c.drawCircle(visibility.center.x, visibility.center.y, 8);
 		c.endFill();
+
+		drawSegments(c, container.visibility);
+
+		/*var b = bunny.getBounds();
+		c.beginFill(0x00ffcc);
+		c.drawRect(b.x, b.y, b.width, b.height);
+		c.endFill();
+		*/
+		container.loadMap(mazeWalls, [bunny.getBounds()])
+
+		renderer.render(stage);
+		stats.end();
 	}
-
-	container.drawLight(cx, cy, 0xffcc00, 0.3)
-
-	c.beginFill(0xffcc00);
-	c.drawCircle(visibility.center.x, visibility.center.y, 8);
-	c.endFill();
-
-	drawSegments(c, container.visibility);
-
-	renderer.render(stage);
-	stats.end();
 }
 
 function drawLight(c, visibility, cx, cy, a1, a2) {

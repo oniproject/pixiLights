@@ -1,11 +1,29 @@
 'use strict';
 
 var Visibility = require('./visibility');
+var NormalMapFilter = require('./NormalMapFilter');
+var LightSpriteBatch = require('./LightSpriteBatch');
 
 var LightContainer = module.exports = function() {
 	PIXI.DisplayObjectContainer.call(this);
 	this.graphics = new PIXI.Graphics();
 	this.visibility = new Visibility();
+
+
+
+	this.size = {
+		width: 1024,
+		height: 768
+	};
+
+	this.diffuseTexture = new PIXI.RenderTexture(this.size.width, this.size.height);
+	this.normalTexture = new PIXI.RenderTexture(this.size.width, this.size.height);
+
+	this.spritebatch = new LightSpriteBatch(this.diffuseTexture.textureBuffer, this.normalTexture.textureBuffer);
+
+	this.diff = new PIXI.Sprite(this.diffuseTexture);
+	this.norm = new PIXI.Sprite(this.normalTexture);
+	this.norm.x = 2505;
 }
 
 LightContainer.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
@@ -37,7 +55,26 @@ LightContainer.prototype.drawLight = function(cx, cy, color, alpha) {
 	c.endFill();
 };
 
-LightContainer.prototype.loadMap = function(walls) {
+LightContainer.prototype.loadMap = function(walls, blocks) {
+	if (walls == null) {
+		walls = [];
+	}
+	if (blocks == null) {
+		blocks = [];
+	}
+	/*
+	blocks = blocks.map(function(block) {
+		return {
+			p1: {
+				x: block[0],
+				y: block[1]
+			},
+			p2: {
+				x: wall[2],
+				y: wall[3]
+			}
+		};
+	});*/
 	walls = walls.map(function(wall) {
 		return {
 			p1: {
@@ -50,5 +87,43 @@ LightContainer.prototype.loadMap = function(walls) {
 			}
 		};
 	});
-	this.visibility.loadMap(30, -2000, [], walls);
+	this.visibility.loadMap(30, -2000, blocks, walls);
+};
+
+////
+
+LightContainer.prototype._renderWebGL = function(renderSession) {
+	if (!this.spritebatch.gl) {
+		this.spritebatch.setContext(renderSession.gl);
+		this.diff.shader = new NormalMapFilter(this.normalTexture);
+	}
+	renderSession.shaderManager.setShader(renderSession.shaderManager.defaultShader);
+
+	renderSession.spriteBatch.stop();
+
+	var i = [];
+	this.collectSprites(this, i);
+
+	this.spritebatch.begin(renderSession);
+	for (var r = 0; r < i.length; r++) {
+		this.spritebatch.render(i[r]);
+	}
+	this.spritebatch.end();
+
+	renderSession.spriteBatch.start();
+};
+
+LightContainer.prototype.collectSprites = function(obj, collection) {
+	obj.anchor && collection.push(obj);
+	for (var i = 0; i < obj.children.length; i++) {
+		this.collectSprites(obj.children[i], collection);
+	}
+};
+
+LightContainer.prototype.resize = function(w, h) {
+	this.size.width = w;
+	this.size.height = h;
+	this.diffuseTexture.resize(w, h);
+	this.normalTexture.resize(w, h);
+	this.occludersFBO.resize(w, h);
 };
