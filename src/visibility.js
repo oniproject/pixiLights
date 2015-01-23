@@ -41,7 +41,7 @@ var Segment = function() {
 }
 
 /** @constructor */
-var Visibility = function() {
+var Visibility = module.exports = function() {
 	// These represent the map and the light location:
 	/** @member {Array} - Array of Segment */
 	this.segments = [];

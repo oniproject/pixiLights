@@ -1,5 +1,7 @@
 'use strict';
 
+var LightContainer = require('.');
+
 var stats = new Stats();
 
 stats.setMode(0);
@@ -81,34 +83,26 @@ for (var i = 0, l = mazeLights.length; i < l; i++) {
 	mazeLights[i].push(color | 0);
 }
 
-var walls = mazeWalls.map(function(wall) {
-	return {
-		p1: {
-			x: wall[0],
-			y: wall[1]
-		},
-		p2: {
-			x: wall[2],
-			y: wall[3]
-		}
-	};
-});
+var container = new LightContainer();
+stage.addChild(container);
+stage.addChild(container.graphics);
 
+container.loadMap(mazeWalls);
+/*
 var visibility = new Visibility();
 
 visibility.loadMap(400, -20000, [], walls);
+*/
 
 
 var cx = 200,
 	cy = 200;
-
-visibility.setLightLocation(cx, cy);
-visibility.sweep();
-
-
-
+/*
 var c = new PIXI.Graphics();
 stage.addChild(c);
+*/
+var visibility = container.visibility;
+var c = container.graphics;
 
 renderer.view.addEventListener('mousemove', function(event) {
 	cx = event.clientX;
@@ -127,15 +121,6 @@ renderer.view.addEventListener('mousemove', function(event) {
 	  */
 
 
-if (visibility.open.toArray) {
-	console.log("open", visibility.open.toArray());
-}
-console.log("open", visibility.open);
-console.log("out", visibility.output);
-console.log("end", visibility.endpoints);
-console.log("segments", visibility.segments);
-
-
 requestAnimFrame(animate);
 function animate() {
 	requestAnimFrame(animate);
@@ -145,24 +130,20 @@ function animate() {
 
 	for (var i = 0, l = mazeLights.length; i < l; i++) {
 		var p = mazeLights[i];
-		c.beginFill(p[2], 0.15);
-		drawLight(c, visibility, p[0], p[1]);
-		c.endFill();
+		container.drawLight(p[0], p[1], p[2], 0.15)
 
 		c.beginFill(0xffcc00);
 		c.drawCircle(p[0], p[1], 3);
 		c.endFill();
 	}
 
-	c.beginFill(0xffcc00, 0.3);
-	drawLight(c, visibility, cx, cy);
-	c.endFill();
+	container.drawLight(cx, cy, 0xffcc00, 0.3)
 
 	c.beginFill(0xffcc00);
 	c.drawCircle(visibility.center.x, visibility.center.y, 8);
 	c.endFill();
 
-	drawSegments(c, visibility);
+	drawSegments(c, container.visibility);
 
 	renderer.render(stage);
 	stats.end();
