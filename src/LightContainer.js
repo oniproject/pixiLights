@@ -29,12 +29,27 @@ var LightContainer = module.exports = function() {
 LightContainer.prototype = Object.create(PIXI.DisplayObjectContainer.prototype);
 LightContainer.prototype.constructor = LightContainer;
 
-LightContainer.prototype.drawLight = function(cx, cy, color, alpha) {
+LightContainer.prototype.drawLight = function(num, cx, cy, color, alpha) {
 	if (color == null) {
 		color = 0x000000;
 	}
 	if (alpha == null) {
 		alpha = 1.0;
+	}
+
+	if (num < 4 && this.diff.shader) {
+		this.diff.shader.uniforms.LightPos.value[num * 3 + 0] = cx;
+		this.diff.shader.uniforms.LightPos.value[num * 3 + 1] = cy;
+		this.diff.shader.uniforms.LightPos.value[num * 3 + 2] = .1;
+
+		var r = (color >> 16) & 0xff;
+		var g = (color >> 8) & 0xff;
+		var b = (color >> 0) & 0xff;
+
+		this.diff.shader.uniforms.LightColor.value[num * 4 + 0] = r / 256;
+		this.diff.shader.uniforms.LightColor.value[num * 4 + 1] = g / 256;
+		this.diff.shader.uniforms.LightColor.value[num * 4 + 2] = b / 256;
+		this.diff.shader.uniforms.LightColor.value[num * 4 + 3] = alpha;
 	}
 
 	var visibility = this.visibility;
@@ -87,6 +102,8 @@ LightContainer.prototype.loadMap = function(walls, blocks) {
 			}
 		};
 	});
+	this.walls = walls;
+	this.blocks = blocks;
 	this.visibility.loadMap(30, -2000, blocks, walls);
 };
 

@@ -97,14 +97,19 @@ loader.onComplete = onAssetsLoaded;
 loader.load();
 
 function onAssetsLoaded() {
+	var diff = 'box_diff02.png';
+	var norm = 'box_norm02.png';
 
+	var sprite = PIXI.Sprite.fromImage(diff);
+	sprite.x = 560;
+	sprite.y = 160;
+	sprite.anchor.x = sprite.anchor.y = 0.5;
+	sprite.scale.x = sprite.scale.y = 1; //0.5;
+	sprite.normalMap = PIXI.Texture.fromImage(norm);
 
-	var bunny = PIXI.Sprite.fromImage('box_diff02.png');
-	bunny.x = bunny.y = 160;
-	bunny.scale.x = bunny.scale.y = 1;
-	bunny.normalMap = PIXI.Texture.fromImage('box_norm02.png');
+	console.log(sprite.texture.crop, sprite.texture.trim);
 
-	container.addChild(bunny);
+	container.addChild(sprite);
 
 
 	var cx = 200,
@@ -136,27 +141,20 @@ function onAssetsLoaded() {
 		stats.begin();
 		c.clear();
 
-		bunny.rotation += 0.01;
+		sprite.rotation += 0.01;
 
-
-
-		if (container.diff.shader) {
-			//this.boxContainer.sp2.shader.uniforms.LightPos.value[0] = this.light.light.x / this.res;
-			//this.boxContainer.sp2.shader.uniforms.LightPos.value[1] = this.light.light.y / this.res;
-			container.diff.shader.uniforms.LightPos.value[0] = cx;
-			container.diff.shader.uniforms.LightPos.value[1] = cy;
-		}
+		container.loadMap(mazeWalls.concat(bounds(sprite, 15)), [])
 
 		for (var i = 0, l = mazeLights.length; i < l; i++) {
 			var p = mazeLights[i];
-			container.drawLight(p[0], p[1], p[2], 0.15)
+			container.drawLight(i + 1, p[0], p[1], p[2], 0.15)
 
 			c.beginFill(0xffcc00);
 			c.drawCircle(p[0], p[1], 3);
 			c.endFill();
 		}
 
-		container.drawLight(cx, cy, 0xffcc00, 0.3)
+		container.drawLight(0, cx, cy, 0xcc0000, 0.3)
 
 		c.beginFill(0xffcc00);
 		c.drawCircle(visibility.center.x, visibility.center.y, 8);
@@ -164,12 +162,6 @@ function onAssetsLoaded() {
 
 		drawSegments(c, container.visibility);
 
-		/*var b = bunny.getBounds();
-		c.beginFill(0x00ffcc);
-		c.drawRect(b.x, b.y, b.width, b.height);
-		c.endFill();
-		*/
-		container.loadMap(mazeWalls, [bunny.getBounds()])
 
 		renderer.render(stage);
 		stats.end();
@@ -211,4 +203,40 @@ function drawSegments(g, visibility) {
 	}
 
 	g.lineStyle(0, 0x000000, 1.0);
+}
+
+function bounds(obj, n) {
+	var w = obj.width - n;
+	var h = obj.height - n;
+	var crop = obj.texture.crop;
+	if (crop) {
+		w = crop.width - n;
+		h = crop.height - n;
+	}
+	var x = w * obj.anchor.x,
+		y = h * obj.anchor.y;
+
+	var p1 = obj.toGlobal({
+		x: x,
+		y: y
+	});
+	var p2 = obj.toGlobal({
+		x: x - w,
+		y: y
+	});
+	var p3 = obj.toGlobal({
+		x: x,
+		y: y - h
+	});
+	var p4 = obj.toGlobal({
+		x: x - w,
+		y: y - h
+	});
+
+	return [
+		[p1.x, p1.y, p2.x, p2.y],
+		[p1.x, p1.y, p3.x, p3.y],
+		[p4.x, p4.y, p2.x, p2.y],
+		[p4.x, p4.y, p3.x, p3.y],
+	];
 }
